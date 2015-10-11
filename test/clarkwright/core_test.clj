@@ -33,17 +33,17 @@
 
 (deftest initial-paths-test
   (testing "generation of initial paths"
-    (is (= (sort  '([:depot :a :depot] [:depot :b :depot]))
-           (sort (generate-initial-paths costs :depot 2))))
+    (is (= #{[:depot :a :depot] [:depot :b :depot]}
+           (into #{} (generate-initial-paths costs :depot 2))))
     (is (= `([:depot ~(ffirst (:depot costs)) :depot])
            (generate-initial-paths costs :depot 1)))
-    (is (= (sort  '([:depot :c :depot] [:depot :a :depot] [:depot :b :depot]))
-           (sort (generate-initial-paths costs2 :depot 3))))
+    (is (= #{[:depot :c :depot] [:depot :a :depot] [:depot :b :depot]}
+           (into #{} (generate-initial-paths costs2 :depot 3))))
     ))
 
 (deftest costs-test
   (testing "cost tests"
-    (is (= {:a {:b 9} :b {:a 9}}
-           (calculate-savings-for-all-points costs :depot)))
-    (is (= {:a {:b 9 :c 6} :b {:a 9 :c 11} :c {:a 6 :b 11}}
-           (calculate-savings-for-all-points costs2 :depot)))))
+    (is (= #{[:b :a 9] [:a :b 9]}
+           (into #{} (calculate-savings-for-all-points costs :depot))))
+    (is (= #{[:a :b 9] [:a :c 6] [:b :a 9] [:b :c 11] [:c :a 6] [:c :b 11]}
+           (into #{} (calculate-savings-for-all-points costs2 :depot))))))
