@@ -21,5 +21,5 @@
   (testing "generation of initial paths"
     (is (= '([:depot :a :depot] [:depot :b :depot])
            (generate-initial-paths costs :depot 2)))
-    (is (= `([:depot ~(first (first (:depot costs))) :depot])
+    (is (= `([:depot ~(ffirst (:depot costs)) :depot])
            (generate-initial-paths costs :depot 1)))))
