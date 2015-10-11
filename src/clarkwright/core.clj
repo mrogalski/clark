@@ -1,12 +1,13 @@
 (ns clarkwright.core)
 
 
+(defn path+costs->edge-costs
+  [path costs]
+  ((apply juxt (map comp path (rest path))) costs))
 
 (defn length
   [path costs]
-  (letfn [(get-costs [& xs]
-            (get-in costs xs))]
-    (apply + (map get-costs path (rest path)))))
+  (apply + (path+costs->edge-costs path costs)))
 
 
 
