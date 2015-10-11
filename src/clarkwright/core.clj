@@ -45,6 +45,31 @@
      (comp delete-loops point-pairs->savings)
      point-pairs-with-loops)))
 
+(defn third [xs]
+  (nth xs 2))
+
+(defn clarkewright
+  [graph depot-key]
+  (let [paths          (generate-initial-paths graph depot-key (dec (count graph)))
+        savings        (calculate-savings-for-all-points graph depot-key)
+        sorted-savings (sort-by third > savings)]
+    (loop [s sorted-savings
+           p paths]
+      (if (empty? s)
+        p
+        (let [endpoints (butlast (first s))
+              has-endpoints? (partial some (set endpoints))
+              groupped (group-by has-endpoints? p)]
+          (println endpoints groupped)
+          (recur (rest s) p)
+
+          )
+      )
+    )
+
+  ))
+
+
 (defn foo
   "I don't do a whole lot."
   [x]
