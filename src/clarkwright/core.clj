@@ -1,12 +1,5 @@
 (ns clarkwright.core)
 
-(def costs
-  {:depot {:a 5
-           :b 7}
-   :a {:depot 5
-       :b 3}
-   :b {:a 3
-       :depot 7}})
 
 
 (defn length

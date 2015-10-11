@@ -2,6 +2,17 @@
   (:require [clojure.test :refer :all]
             [clarkwright.core :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(def costs
+  {:depot {:a 5
+           :b 7}
+   :a {:depot 5
+       :b 3}
+   :b {:a 3
+       :depot 7}})
+
+(deftest length-test
+  (testing "path length testing"
+    (is (= 3 (length [:a :b] costs)))
+    (is (= 10 (length [:depot :a :depot] costs)))
+    (is (= 14 (length [:depot :b :depot] costs)))
+    (is (= 15 (length [:depot :a :b :depot] costs)))))
