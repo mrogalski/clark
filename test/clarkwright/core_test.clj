@@ -16,3 +16,10 @@
     (is (= 10 (length [:depot :a :depot] costs)))
     (is (= 14 (length [:depot :b :depot] costs)))
     (is (= 15 (length [:depot :a :b :depot] costs)))))
+
+(deftest initial-paths-test
+  (testing "generation of initial paths"
+    (is (= '([:depot :a :depot] [:depot :b :depot])
+           (generate-initial-paths costs :depot 2)))
+    (is (= `([:depot ~(first (first (:depot costs))) :depot])
+           (generate-initial-paths costs :depot 1)))))
