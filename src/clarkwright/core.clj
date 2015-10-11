@@ -37,11 +37,11 @@
 
 (defn calculate-savings-for-all-points
   [graph depot-key]
-  (let [points                           (keys (depot-key graph))
-        calculate-savings-for-point-pair (map (partial calculate-savings graph depot-key))
-        deep-merge                       (partial merge-with merge)]
+  (let [points               (keys (depot-key graph))
+        point-pairs->savings (map (partial calculate-savings graph depot-key))
+        deep-merge           (partial merge-with merge)]
     (->> (cartesian-product points points)
-         (sequence (comp delete-loops calculate-savings-for-point-pair))
+         (sequence (comp delete-loops point-pairs->savings))
          (reduce deep-merge))))
 
 (defn foo
