@@ -40,3 +40,10 @@
     (is (= (sort  '([:depot :c :depot] [:depot :a :depot] [:depot :b :depot]))
            (sort (generate-initial-paths costs2 :depot 3))))
     ))
+
+(deftest costs-test
+  (testing "cost tests"
+    (is (= {:a {:b 9} :b {:a 9}}
+           (calculate-savings-for-all-points costs :depot)))
+    (is (= {:a {:b 9 :c 6} :b {:a 9 :c 11} :c {:a 6 :b 11}}
+           (calculate-savings-for-all-points costs2 :depot)))))
