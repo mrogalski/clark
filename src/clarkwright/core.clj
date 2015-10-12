@@ -48,22 +48,34 @@
 (defn third [xs]
   (nth xs 2))
 
+
+(defn find-endpoints-in-paths
+  [paths endpoints]
+  (let [has-endpoints? (partial some (set endpoints))
+        groupped (group-by has-endpoints? paths)
+        start-path (first (groupped (first endpoints)))
+        end-path (first (groupped (second endpoints)))
+        all-others (groupped nil)]
+    [start-path end-path all-others]))
+
+
 (defn clarkewright
   [graph depot-key]
   (let [paths          (generate-initial-paths graph depot-key (dec (count graph)))
         savings        (calculate-savings-for-all-points graph depot-key)
         sorted-savings (sort-by third > savings)]
     (loop [s sorted-savings
-           p paths]
+           ps paths]
       (if (empty? s)
-        p
+        ps
         (let [endpoints (butlast (first s))
-              has-endpoints? (partial some (set endpoints))
-              groupped (group-by has-endpoints? p)]
-          (println endpoints groupped)
-          (recur (rest s) p)
-
-          )
+              [start-path end-path all-others] (find-endpoints-in-paths ps endpoints)]
+          (if (or (empty? start-path)
+                  (empty? end-path))
+            (recur (rest s) ps)
+            (do
+              (println start-path end-path all-others)
+              (recur (rest s) ps))))
       )
     )
 
