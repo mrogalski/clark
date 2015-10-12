@@ -59,6 +59,12 @@
     [start-path end-path all-others]))
 
 
+(defn all-empty? [& xs]
+  (->> xs
+       (map empty?)
+       (some true?)))
+
+
 (defn clarkewright
   [graph depot-key]
   (let [paths          (generate-initial-paths graph depot-key (dec (count graph)))
@@ -70,8 +76,7 @@
         ps
         (let [endpoints (butlast (first s))
               [start-path end-path all-others] (find-endpoints-in-paths ps endpoints)]
-          (if (or (empty? start-path)
-                  (empty? end-path))
+          (if (all-empty? start-path end-path)
             (recur (rest s) ps)
             (do
               (println start-path end-path all-others)
