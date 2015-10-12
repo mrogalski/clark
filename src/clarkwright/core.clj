@@ -59,12 +59,6 @@
     [start-path end-path all-others]))
 
 
-(defn all-empty? [& xs]
-  (->> xs
-       (map empty?)
-       (some true?)))
-
-
 (defn strip-endpoints [x]
   (-> x
       rest
@@ -73,14 +67,17 @@
 (defn connect [x y]
   (concat (butlast x) (rest y)))
 
-(defn connect-if-possible [x y [pathx pathy]]
-  (println x y pathx pathy (strip-endpoints x) (strip-endpoints y))
-  (let [[sx ex] ((juxt first last) (strip-endpoints x))
-        [sy ey] ((juxt first last) (strip-endpoints y))]
-    (cond
-      (and (= ex pathx) (= sy pathy)) [(connect x y)]
-      (and (= ey pathx) (= sx pathy)) [(connect y x)]
-      :else [x y])))
+(defn get-first-and-last [path]
+  ((juxt first last)
+   (strip-endpoints path)))
+
+(defn connect-if-possible [pathx pathy endpoints]
+  (let [[startx endx] (get-first-and-last pathx)
+        [starty endy] (get-first-and-last pathy)]
+    (condp = endpoints
+      [endx starty] [(connect pathx pathy)]
+      [endy startx] [(connect pathy pathx)]
+      :else (remove nil? [pathx pathy]))))
 
 
 (defn clarkewright
@@ -92,12 +89,14 @@
            ps paths]
       (if (empty? s)
         ps
-        (let [endpoints (butlast (first s))
-              [start-path end-path all-others] (find-endpoints-in-paths ps endpoints)
-              endpoints-one-one-path? (all-empty? start-path end-path)]
-          (if endpoints-one-one-path?
-            (recur (rest s) ps)
-            (recur (rest s) (concat all-others (connect-if-possible start-path end-path endpoints)))))
+        (let [endpoints       (butlast (first s))
+              [start-path
+               end-path
+               all-others]    (find-endpoints-in-paths ps endpoints)
+              maybe-connected (connect-if-possible start-path
+                                                   end-path
+                                                   endpoints)]
+          (recur (rest s) (concat all-others maybe-connected)))
       )
     )
 
