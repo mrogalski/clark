@@ -36,17 +36,17 @@
 (def delete-loops
   (remove (partial apply =)))
 
+(def remove-losses
+  (filter (comp pos? last)))
+
 (defn calculate-savings-for-all-points
   [graph depot-key]
   (let [points                 (keys (depot-key graph))
         point-pairs->savings   (map (partial calculate-savings graph depot-key))
         point-pairs-with-loops (cartesian-product points points)]
     (sequence
-     (comp delete-loops point-pairs->savings)
+     (comp delete-loops point-pairs->savings remove-losses)
      point-pairs-with-loops)))
-
-(defn third [xs]
-  (nth xs 2))
 
 
 (defn find-endpoints-in-paths
@@ -77,14 +77,13 @@
     (condp = endpoints
       [endx starty] [(connect pathx pathy)]
       [endy startx] [(connect pathy pathx)]
-      :else (remove nil? [pathx pathy]))))
-
+      (remove nil? [pathx pathy]))))
 
 (defn clarkewright
   [graph depot-key]
   (let [paths          (generate-initial-paths graph depot-key (dec (count graph)))
         savings        (calculate-savings-for-all-points graph depot-key)
-        sorted-savings (sort-by third > savings)]
+        sorted-savings (sort-by last > savings)]
     (loop [s sorted-savings
            ps paths]
       (if (empty? s)
