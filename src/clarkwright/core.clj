@@ -65,6 +65,24 @@
        (some true?)))
 
 
+(defn strip-endpoints [x]
+  (-> x
+      rest
+      butlast))
+
+(defn connect [x y]
+  (concat (butlast x) (rest y)))
+
+(defn connect-if-possible [x y [pathx pathy]]
+  (println x y pathx pathy (strip-endpoints x) (strip-endpoints y))
+  (let [[sx ex] ((juxt first last) (strip-endpoints x))
+        [sy ey] ((juxt first last) (strip-endpoints y))]
+    (cond
+      (and (= ex pathx) (= sy pathy)) [(connect x y)]
+      (and (= ey pathx) (= sx pathy)) [(connect y x)]
+      :else [x y])))
+
+
 (defn clarkewright
   [graph depot-key]
   (let [paths          (generate-initial-paths graph depot-key (dec (count graph)))
@@ -75,12 +93,11 @@
       (if (empty? s)
         ps
         (let [endpoints (butlast (first s))
-              [start-path end-path all-others] (find-endpoints-in-paths ps endpoints)]
-          (if (all-empty? start-path end-path)
+              [start-path end-path all-others] (find-endpoints-in-paths ps endpoints)
+              endpoints-one-one-path? (all-empty? start-path end-path)]
+          (if endpoints-one-one-path?
             (recur (rest s) ps)
-            (do
-              (println start-path end-path all-others)
-              (recur (rest s) ps))))
+            (recur (rest s) (concat all-others (connect-if-possible start-path end-path endpoints)))))
       )
     )
 
