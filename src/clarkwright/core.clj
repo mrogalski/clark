@@ -113,7 +113,7 @@
               path-exceeds-capacity? (exceeds-capacity?
                                       total-car-capacity
                                       quantities
-                                      (first-maybe-connected))
+                                      (first maybe-connected))
               new-paths              (if (and connection-made?
                                               path-exceeds-capacity?)
                                        ps
