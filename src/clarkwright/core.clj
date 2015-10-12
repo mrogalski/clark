@@ -79,8 +79,22 @@
       [endy startx] [(connect pathy pathx)]
       (remove nil? [pathx pathy]))))
 
+
+(defn quantity-cost
+  [quantities path]
+  (->> path
+       strip-endpoints
+       (select-keys quantities)
+       vals
+       (apply +)))
+
+(defn exceeds-capacity?
+  [capacity quantities path]
+  (< capacity (quantity-cost quantities path)))
+
+
 (defn clarkewright
-  [graph depot-key]
+  [graph depot-key quantities total-car-capacity]
   (let [paths          (generate-initial-paths graph depot-key (dec (count graph)))
         savings        (calculate-savings-for-all-points graph depot-key)
         sorted-savings (sort-by last > savings)]
@@ -88,18 +102,23 @@
            ps paths]
       (if (empty? s)
         ps
-        (let [endpoints       (butlast (first s))
+        (let [endpoints              (butlast (first s))
               [start-path
                end-path
-               all-others]    (find-endpoints-in-paths ps endpoints)
-              maybe-connected (connect-if-possible start-path
-                                                   end-path
-                                                   endpoints)]
-          (recur (rest s) (concat all-others maybe-connected)))
-      )
-    )
-
-  ))
+               all-others]           (find-endpoints-in-paths ps endpoints)
+              maybe-connected        (connect-if-possible start-path
+                                                          end-path
+                                                          endpoints)
+              connection-made?       (= 1 (count maybe-connected))
+              path-exceeds-capacity? (exceeds-capacity?
+                                      total-car-capacity
+                                      quantities
+                                      (first-maybe-connected))
+              new-paths              (if (and connection-made?
+                                              path-exceeds-capacity?)
+                                       ps
+                                       (concat all-others maybe-connected))]
+          (recur (rest s) new-paths))))))
 
 
 (defn foo
