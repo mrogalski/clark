@@ -126,6 +126,11 @@
         :8 46
         :9 36}})
 
+
+(def quantities
+  {:2 4, :3 6, :4 5, :5 4, :6 7, :7 3, :8 5, :9 4, :10 4})
+
+
 (deftest length-test
   (testing "path length testing"
     (is (= 3 (length [:a :b] costs)))
@@ -149,3 +154,8 @@
            (into #{} (calculate-savings-for-all-points costs :depot))))
     (is (= #{[:a :b 9] [:a :c 6] [:b :a 9] [:b :c 11] [:c :a 6] [:c :b 11]}
            (into #{} (calculate-savings-for-all-points costs2 :depot))))))
+
+(deftest clarkwright-test
+  (testing "clarke and wright"
+    (is (= #{[:1 :3 :2 :4 :5 :1] [:1 :8 :9 :10 :6 :7 :1]}
+           (into #{} (clarkewright graph-cw :1 quantities 23))))))
